@@ -1,0 +1,55 @@
+name: MetaDefender Scan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  metadefender-scan:
+    runs-on: ubuntu-latest
+    env:
+      METADEFENDER_API_KEY: ${{ secrets.METADEFENDER_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify API key
+        run: |
+          test -n "$METADEFENDER_API_KEY" || {
+            echo "METADEFENDER_API_KEY repository secret is required."
+            exit 1
+          }
+
+      - name: Create source archive
+        run: zip -r repository.zip . -x ".git/*" "doc/*"
+
+      - name: Scan archive
+        run: |
+          response="$(curl --fail-with-body --silent --show-error \
+            --header "apikey: $METADEFENDER_API_KEY" \
+            --form "file=@repository.zip" \
+            https://api.metadefender.com/v4/file)"
+          dataId="$(jq --raw-output '.data_id' <<< "$response")"
+          test -n "$dataId" && test "$dataId" != "null"
+
+          for attempt in {1..60}; do
+            result="$(curl --fail-with-body --silent --show-error \
+              --header "apikey: $METADEFENDER_API_KEY" \
+              "https://api.metadefender.com/v4/file/$dataId")"
+            progress="$(jq --raw-output '.scan_results.progress_percentage // 0' <<< "$result")"
+            if [ "$progress" = "100" ]; then
+              verdict="$(jq --raw-output '.scan_results.scan_all_result_a // "Unknown"' <<< "$result")"
+              echo "MetaDefender verdict: $verdict"
+              test "$verdict" = "No Threat Detected"
+              exit $?
+            fi
+            sleep 5
+          done
+
+          echo "MetaDefender scan timed out."
+          exit 1
