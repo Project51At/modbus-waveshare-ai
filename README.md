@@ -45,6 +45,16 @@ Change the address:
 
 Configure channel modes:
 
+Available `<mode>` values:
+
+```text
+0  voltage mode 0-5V, B model 0-10V
+1  voltage mode 1-5V, B model 2-10V
+2  current mode 0-20mA
+3  current mode 4-20mA
+4  raw 4096-scale code
+```
+
 ```bash
 ./modbus-waveshare-ai.sh <usb-device> <node-number> --get-channel <channel>
 ./modbus-waveshare-ai.sh <usb-device> <node-number> --get-all-channels
@@ -96,15 +106,7 @@ The script first reads register `0x4000` at the current address, writes the new 
 
 Without `--change-address`, the script does not change the device address. It verifies that a Waveshare AI-8CH-compatible register map responds: device address `0x4000`, software version `0x8000`, channel modes `0x1000..0x1007`, and eight analog values using function `0x04`. The protocol does not expose a unique product ID register.
 
-Channel mode values:
-
-```text
-0  voltage mode 0-5V, B model 0-10V
-1  voltage mode 1-5V, B model 2-10V
-2  current mode 0-20mA
-3  current mode 4-20mA
-4  raw 4096-scale code
-```
+Channel mode values are defined in the [Configure channel modes](#configure-channel-modes) section above.
 
 The module jumpers must match the selected mode: open jumper for voltage and closed jumper for current.
 
