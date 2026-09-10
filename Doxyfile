@@ -1,0 +1,23 @@
+PROJECT_NAME           = "Waveshare Modbus AI 8CH Management Tool"
+PROJECT_BRIEF          = "Modbus RTU management for Waveshare Analog Input 8CH modules"
+PROJECT_NUMBER         = "1.0"
+
+OUTPUT_DIRECTORY       = doc
+CREATE_SUBDIRS         = NO
+
+INPUT                  = modbus-waveshare-ai.py modbus-waveshare-ai.sh
+FILE_PATTERNS          = *.py *.sh
+RECURSIVE              = NO
+EXTENSION_MAPPING      = py=Python sh=Python
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+JAVADOC_AUTOBRIEF      = YES
+MULTILINE_CPP_IS_BRIEF = YES
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = YES
